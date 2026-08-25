@@ -1,16 +1,32 @@
 import { NextResponse } from "next/server";
-import { getSheet } from "../../../lib/sheets";
+import { addRecord } from "../../../lib/store-data";
 
 export async function POST(request: Request) {
   try {
     const data = await request.json();
 
-    if (typeof data.name !== "string" || typeof data.phone !== "string" || !data.name.trim() || !data.phone.trim()) {
-      return NextResponse.json({ error: "Name and phone are required." }, { status: 400 });
+    const requiredFields = ["name", "phone", "wilaya", "commune", "livraison", "color", "product"];
+    if (requiredFields.some((field) => typeof data[field] !== "string" || !data[field].trim()) || !Number.isInteger(data.quantity) || data.quantity < 1) {
+      return NextResponse.json({ error: "All order fields are required." }, { status: 400 });
     }
 
-    const sheet = await getSheet();
-    await sheet.addRow({ Name: data.name.trim(), Phone: data.phone.trim() });
+    const quantity = data.quantity as number;
+    const deliveryPrice = data.livraison.trim() === "À domicile" ? 500 : 300;
+    await addRecord("Orders", {
+      Id: crypto.randomUUID(),
+      Name: data.name.trim(),
+      Number: data.phone.trim(),
+      Willaya: data.wilaya.trim(),
+      Commune: data.commune.trim(),
+      Livraison: data.livraison.trim(),
+      Color: data.color.trim(),
+      Product: data.product.trim(),
+      Quantity: quantity,
+      Total: data.total ?? deliveryPrice,
+      Status: "Pending",
+      CreatedAt: new Date().toISOString(),
+      UpdatedAt: new Date().toISOString(),
+    });
 
     return NextResponse.json({ success: true });
   } catch (error) {
