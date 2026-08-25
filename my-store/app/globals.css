@@ -1,8 +1,10 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f5f1e8;
+  --foreground: #1d2924;
+  --accent: #d95f39;
+  --line: #c9c2b3;
 }
 
 @theme inline {
@@ -12,15 +14,113 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: Georgia, "Times New Roman", serif;
+  margin: 0;
+}
+
+.contact-page {
+  align-items: center;
+  background: radial-gradient(circle at 85% 15%, #e8c9a6 0, transparent 28%), var(--background);
+  display: flex;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 2rem 1.25rem;
+}
+
+.contact-panel {
+  background: rgba(255, 252, 245, 0.78);
+  border: 1px solid var(--line);
+  max-width: 33rem;
+  padding: clamp(2rem, 7vw, 5rem);
+  width: 100%;
+}
+
+.eyebrow {
+  color: var(--accent);
+  font-family: var(--font-geist-sans), sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  margin: 0 0 2rem;
+  text-transform: uppercase;
+}
+
+h1 {
+  font-size: clamp(2.5rem, 8vw, 4.75rem);
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 0.98;
+  margin: 0;
+  max-width: 9ch;
+}
+
+.intro {
+  color: #59645e;
+  font-family: var(--font-geist-sans), sans-serif;
+  line-height: 1.6;
+  margin: 1.5rem 0 2.5rem;
+  max-width: 32rem;
+}
+
+.contact-form {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.contact-form label {
+  font-family: var(--font-geist-sans), sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-top: 0.75rem;
+}
+
+.contact-form input {
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  border-radius: 0;
+  box-sizing: border-box;
+  color: var(--foreground);
+  font: 1.05rem Georgia, "Times New Roman", serif;
+  outline: 0;
+  padding: 0.65rem 0;
+  width: 100%;
+}
+
+.contact-form input:focus {
+  border-bottom-color: var(--accent);
+}
+
+.contact-form button {
+  background: var(--foreground);
+  border: 0;
+  color: #fffaf0;
+  cursor: pointer;
+  font-family: var(--font-geist-sans), sans-serif;
+  font-size: 0.9rem;
+  font-weight: 700;
+  margin-top: 2rem;
+  padding: 1rem;
+}
+
+.contact-form button:disabled {
+  cursor: wait;
+  opacity: 0.6;
+}
+
+.form-message {
+  font-family: var(--font-geist-sans), sans-serif;
+  font-size: 0.9rem;
+  min-height: 1.4em;
+}
+
+.form-message.success {
+  color: #26734d;
+}
+
+.form-message.error {
+  color: #b33d2b;
 }
