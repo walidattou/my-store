@@ -3,27 +3,26 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { LayoutDashboard, LogOut, Package, ShoppingBag, Sparkles } from "lucide-react";
 
 type RecordValue = Record<string, string | number | boolean>;
 const navigation = [
-  "Dashboard",
-  "Orders",
-  "Products",
-  "Customers",
-  "Categories",
-  "Discounts",
-  "Delivery",
-  "Store Settings",
+  { id: "Dashboard", label: "Vue d'ensemble", Icon: LayoutDashboard },
+  { id: "Orders", label: "Commandes", Icon: ShoppingBag },
+  { id: "Products", label: "Produits", Icon: Package },
 ];
 const tabFor = (section: string) =>
   (
     ({
       Orders: "Orders",
       Products: "Products",
-      Delivery: "Delivery",
-      "Store Settings": "Settings",
     }) as Record<string, string>
   )[section];
+const sectionLabels: Record<string, string> = {
+  Dashboard: "Vue d'ensemble",
+  Orders: "Commandes",
+  Products: "Produits",
+};
 async function fetchRecords(tab: string, signal?: AbortSignal) {
   const response = await fetch(
     `/api/admin/data?tab=${encodeURIComponent(tab)}`,
@@ -91,41 +90,34 @@ export default function AdminPanel() {
     <main className="admin-shell">
       <aside className="admin-sidebar">
         <div className="admin-logo">
-          ATELIER<span>.</span>
-          <small>CONTROL ROOM</small>
+          <span className="admin-logo-mark">جودة<Sparkles aria-hidden="true" /></span>
+          <small>GESTION DU MAGASIN</small>
         </div>
         <nav>
           {navigation.map((item) => (
             <button
-              className={section === item ? "nav-item active" : "nav-item"}
-              key={item}
-              onClick={() => selectSection(item)}
+              className={section === item.id ? "nav-item active" : "nav-item"}
+              key={item.id}
+              onClick={() => selectSection(item.id)}
             >
-              <span>
-                {item === "Dashboard"
-                  ? "⌂"
-                  : item === "Orders"
-                    ? "▣"
-                    : item === "Products"
-                      ? "◇"
-                      : "○"}
-              </span>
-              {item}
+              <item.Icon aria-hidden="true" />
+              <span>{item.label}</span>
             </button>
           ))}
         </nav>
         <button className="logout" onClick={logout}>
+          <LogOut aria-hidden="true" />
           Se déconnecter
         </button>
       </aside>
       <section className="admin-content">
         <header className="admin-topbar">
           <div>
-            <p className="admin-kicker">Boutique / Vue générale</p>
-            <h1>{section}</h1>
+            <p className="admin-kicker">جودة / GESTION DU MAGASIN</p>
+            <h1>{sectionLabels[section]}</h1>
           </div>
-          <a href="/" target="_blank">
-            Voir la boutique ↗
+          <a href="/" target="_blank" rel="noreferrer">
+            Voir la boutique <span aria-hidden="true">↗</span>
           </a>
         </header>
         {section === "Dashboard" ? (
@@ -133,6 +125,7 @@ export default function AdminPanel() {
             records={records}
             revenue={revenue}
             onOpen={selectSection}
+            onAddProduct={() => setShowProductForm(true)}
           />
         ) : tab ? (
           <DataSection
@@ -144,9 +137,7 @@ export default function AdminPanel() {
               section === "Products" ? setShowProductForm(true) : undefined
             }
           />
-        ) : (
-          <EmptySection section={section} />
-        )}{" "}
+        ) : null}
         {showProductForm && (
           <ProductForm
             onClose={() => setShowProductForm(false)}
@@ -165,10 +156,12 @@ function Dashboard({
   records,
   revenue,
   onOpen,
+  onAddProduct,
 }: {
   records: RecordValue[];
   revenue: number;
   onOpen: (section: string) => void;
+  onAddProduct: () => void;
 }) {
   return (
     <>
@@ -184,7 +177,12 @@ function Dashboard({
             .filter((record) => !record.Status || record.Status === "Pending")
             .length.toString()}
         />
-        <Metric label="Produits" value="—" />
+        <Metric
+          label="Livrées"
+          value={records
+            .filter((record) => record.Status === "Delivered")
+            .length.toString()}
+        />
       </div>
       <div className="dashboard-grid">
         <div className="admin-panel">
@@ -201,16 +199,9 @@ function Dashboard({
           )}
         </div>
         <div className="admin-panel quick-actions">
-          <h2>Accès rapide</h2>
-          <button onClick={() => onOpen("Products")}>
-            + Ajouter un produit
-          </button>
-          <button onClick={() => onOpen("Delivery")}>
-            Modifier la livraison
-          </button>
-          <button onClick={() => onOpen("Store Settings")}>
-            Paramètres boutique
-          </button>
+          <h2>Actions rapides</h2>
+          <button onClick={onAddProduct}>+ Ajouter un produit</button>
+          <button onClick={() => onOpen("Orders")}>Voir les commandes</button>
         </div>
       </div>
     </>
@@ -241,12 +232,14 @@ function DataSection({
     <div className="admin-panel data-panel">
       <div className="panel-title">
         <div>
-          <h2>{section}</h2>
+          <h2>{sectionLabels[section]}</h2>
           <p>{records.length} élément(s) synchronisé(s) avec Google Sheets</p>
         </div>
-        <button className="primary-action" onClick={onAdd}>
-          + Ajouter
-        </button>
+        {onAdd && (
+          <button className="primary-action" onClick={onAdd}>
+            + Ajouter un produit
+          </button>
+        )}
       </div>
       {loading ? (
         <p className="empty">Chargement...</p>
@@ -575,19 +568,6 @@ function GenericTable({
     <p className="empty">
       Aucune donnée pour le moment. Utilisez “Ajouter” pour commencer.
     </p>
-  );
-}
-function EmptySection({ section }: { section: string }) {
-  return (
-    <div className="admin-panel empty-section">
-      <div className="empty-icon">+</div>
-      <h2>{section}</h2>
-      <p>
-        Cette section est prête à recevoir vos données. Elle sera synchronisée
-        avec votre espace de gestion.
-      </p>
-      <button className="primary-action">+ Ajouter</button>
-    </div>
   );
 }
 function ImageUploader({

@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import "@fontsource-variable/cairo";
+import "@fontsource-variable/changa";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -13,14 +15,15 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Atelier | Converse Double Semelle",
-  description: "Découvrez notre collection essentielle et commandez en quelques clics.",
+  title: "جودة | اختيارات تستحقها",
+  description: "منتجات عملية وأنيقة، مختارة بعناية وتوصّل إلى بابك في كل الجزائر.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
-      lang="en"
+      lang="ar"
+      dir="rtl"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">{children}</body>
